@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "inventory-qr-code"
+version = "0.1.0"
+description = ""
+authors = ["my <jakha921@gmail.com>"]
+readme = "README.md"
+packages = [{include = "inventory_qr_code"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django = "^4.2.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
