@@ -10,7 +10,7 @@ class Corpus(models.Model):
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return f"Corpus: {self.name}"
 
     class Meta:
         verbose_name_plural = 'Korpus'
@@ -22,7 +22,7 @@ class Floor(models.Model):
     corpus = models.ForeignKey(Corpus, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.corpus.name} - {self.floor_number}'
+        return f"Floors: {self.floor_number} - {self.corpus.name}"
 
     class Meta:
         verbose_name_plural = 'Qavat'
@@ -34,7 +34,7 @@ class Room(models.Model):
     floor = models.ForeignKey(Floor, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.floor.corpus.name} - {self.floor.floor_number} - {self.room_number}'
+        return f"Room: {self.room_number} - {self.floor.floor_number}"
 
     class Meta:
         verbose_name_plural = 'Xona'
@@ -52,7 +52,7 @@ class Teacher(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.surname} {self.name} -> {self.room}'
+        return f"Teacher: {self.name} {self.surname} - {self.room}"
 
     class Meta:
         verbose_name_plural = 'O`qituvchi'
@@ -77,7 +77,7 @@ class RoomInventory(models.Model):
     count = models.IntegerField()
 
     def __str__(self):
-        return f'{self.room} - {self.inventory} - {self.count}'
+        return f'Resurs: {self.inventory.name} - {self.room.room_number}'
 
     class Meta:
         verbose_name_plural = 'Xonadagi inventar'
