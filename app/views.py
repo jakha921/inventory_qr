@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 
 from app.models import Room
+from app.utils import create_qrcode
 
 
 # Create your views here.
@@ -19,3 +19,19 @@ def index(request, room_id):
     }
 
     return render(request, "app/index.html", context)
+
+
+def internment(request):
+    rooms = Room.objects.all()
+
+    # generate_qrcode('path', 'name', 'link')
+    # set path
+
+    # for room in rooms:
+    #     url = f'http://213.230.69.57:8888/invernment/room/{room.id}'
+    #     create_qrcode(url, room.room_number)
+
+    context = {
+        'rooms': rooms
+    }
+    return render(request, "app/invernments.html", context)

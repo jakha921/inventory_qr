@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invernments</title>
+</head>
+<body>
+<ul>
+    {% for room in rooms %}
+        <li>
+            <!-- <a href="invernment/room/1">ATM</a> -->
+            <a href="invernment/room/{{ room.id }}">{{ room.room_number }}</a>
+        </li>
+    {% endfor %}
+</ul>
+</body>
+</html>
