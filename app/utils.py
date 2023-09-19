@@ -10,7 +10,7 @@ def generate_qrcode(data, name: str, link: str):
     # try:
     print(name)
     img = qrcode.make(data)
-    img.save(f'app/static/f{name}.png')
+    img.save(f'app/static/qr/f{name}.png')
     return {'status': 'success'}
     # except:
     #     with open(f'static/f{name}.png', 'rb') as f:
