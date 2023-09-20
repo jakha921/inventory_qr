@@ -50,11 +50,9 @@
         <div class="col-md-8">
             <p><strong>FIO:</strong> {{ teacher.name }} {{ teacher.surname }} </p>
             <p><strong>Xona:</strong> {{ room.room_number }}</p>
-            <p><strong>Ilmiy darajasi:</strong> Magistr</p>
-            {% if teacher.image %}
-                <p><strong>Qisqacha malumoy:</strong> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci
-                    aliquam asperiores atque autem consequatur cumque cupiditate delectus doloremque doloribus ea earum
-                    eligendi eos error esse est eum eveniet excepturi.
+            <p><strong>Ilmiy darajasi:</strong> {{ teacher.degree }}</p>
+            {% if teacher.description %}
+                <p><strong>Qisqacha ma`lumot:</strong> {{ teacher.description }}</p>
                 </p>
             {% endif %}
         </div>
