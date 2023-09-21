@@ -47,8 +47,9 @@ class Teacher(models.Model):
         ('Bakalavr', 'Bakalavr'),
         ('Magistr', 'Magistr'),
         ('Doktorant', 'Doktorant'),
+        ('Professor', 'Professor'),
+        ('Akademik', 'Akademik'),
     )
-
 
     name = models.CharField('Ismi', max_length=255)  # 'Ismi
     surname = models.CharField('Familiyasi', max_length=255)  # 'Familiyasi
@@ -58,7 +59,8 @@ class Teacher(models.Model):
                              default='https://cdn4.iconfinder.com/data/icons/signicon-pt-1-1/100/041_-_user_profile_avatar_login_account-1024.png')
     email = models.EmailField(blank=True, null=True)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name='Ma`sul xona')
-    degree = models.CharField('Ilmiy darajasi', max_length=255, choices=degree_choices, default='O`rta', blank=True, null=True)
+    degree = models.CharField('Ilmiy darajasi', max_length=255, choices=degree_choices, default='O`rta', blank=True,
+                              null=True)
     description = models.TextField('Qisqacha ma`lumot', blank=True, null=True)
 
     def __str__(self):
@@ -92,3 +94,23 @@ class RoomInventory(models.Model):
     class Meta:
         verbose_name_plural = 'Xonadagi inventar'
         verbose_name = 'Xonadagi inventarlar'
+
+
+class Warehouse(models.Model):
+    status_choices = (
+        ('Omborda', 'Omborda'),
+        ('Ta`mir qilinmoqda', 'Ta`mir qilinmoqda'),
+        ('Xonaga o`rnatilgan', 'Xonaga o`rnatilgan'),
+        ('Buzilgan', 'Buzilgan'),
+    )
+
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi')
+    count = models.IntegerField('Soni')
+    status = models.CharField('Holati', max_length=255, choices=status_choices, default='Omborda')
+
+    def __str__(self):
+        return f'Inventar: {self.inventory.name}'
+
+    class Meta:
+        verbose_name_plural = 'Ombor'
+        verbose_name = 'Omborlar'

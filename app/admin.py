@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from app.models import Corpus, Floor, Room, Teacher, Inventory, RoomInventory
+from app.models import Corpus, Floor, Room, Teacher, Inventory, RoomInventory, Warehouse
 
 # Register your models here.
 admin.site.site_header = 'Inventar boshqaruv tizimi'
@@ -40,17 +40,17 @@ class RoomAdmin(admin.ModelAdmin):
 
     def room_locations(self, obj):
         """return as list number and name"""
-        return f'{obj.floor.corpus.name} Korpusi, {obj.floor.floor_number} - qavat, {obj.room_number} - xona'
+        return f'ID: {obj.id}, {obj.floor.corpus.name} Korpusi, {obj.floor.floor_number} - qavat, {obj.room_number} - xona'
 
     room_locations.short_description = 'Xona joylashgan joyi'
 
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    list_display = ('teacher_room', 'name', 'surname', 'patronymic', 'phone', 'email', 'room')
-    list_filter = ('name', 'surname', 'patronymic', 'phone', 'email', 'room')
+    list_display = ('teacher_room', 'name', 'surname', 'patronymic', 'room')
+    list_filter = ('name', 'surname', 'room')
     search_fields = ('name', 'surname', 'patronymic', 'phone', 'email', 'room')
-    list_editable = ('name', 'surname', 'patronymic', 'phone', 'email', 'room')
+    list_editable = ('name', 'surname', 'patronymic', 'room')
 
     def teacher_room(self, obj):
         return (f'{obj.room.floor.corpus.name} Korpusi, {obj.room.floor.floor_number} - qavat, '
@@ -83,3 +83,18 @@ class RoomInventoryAdmin(admin.ModelAdmin):
         return f'{obj.room} xonasida {obj.inventory} {obj.count} ta mavjud'
 
     inverntor_room.short_description = 'Inventar xonada mavjudligi'
+
+
+@admin.register(Warehouse)
+class WarehouseAdmin(admin.ModelAdmin):
+    list_display = ('inventory_name', 'inventory', 'status', 'count')
+    list_filter = ('status', 'inventory')
+    search_fields = ('inventory', 'status', 'count')
+    list_editable = ('count',)
+    # readonly_fields = ('inventory', 'status')
+
+    def inventory_name(self, obj):
+        return f'{obj.inventory.name} {obj.count} ta'
+
+    inventory_name.short_description = 'Inventar'
+
