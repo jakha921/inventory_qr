@@ -109,6 +109,7 @@ class Warehouse(models.Model):
     inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi')
     count = models.IntegerField('Soni')
     status = models.CharField('Holati', max_length=255, choices=status_choices, default='Omborda')
+    price = models.FloatField('Narxi', blank=True, null=True)
 
     def __str__(self):
         return f'Inventar: {self.inventory.name}'
