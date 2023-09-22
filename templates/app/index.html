@@ -43,9 +43,17 @@
 <div class="container my-5">
     <div class="row">
         <div class="col-md-4">
-            <img src="{{ teacher.image }}" alt="Фото учителя"
-                 class="img-fluid rounded-3 shadow bg-body"
-                 width="200px">
+            {#            <img src="{{ teacher.image }}" alt="Фото учителя"#}
+            {% if teacher.avatar %}
+                <img src="{{ teacher.avatar.url }}" alt="Фото учителя"
+                     class="img-fluid rounded-3 shadow bg-body"
+                     width="200px">
+            {% else %}
+                <img src="{{ teacher.image }}" alt="Фото учителя"
+                     class="img-fluid rounded-3 shadow bg-body"
+                     width="200px">
+            {% endif %}
+
         </div>
         <div class="col-md-8">
             <p><strong>FIO:</strong> {{ teacher.name }} {{ teacher.surname }} </p>
