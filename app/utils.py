@@ -10,7 +10,7 @@ def generate_qrcode(data, name: str, link: str):
     # try:
     print(name)
     img = qrcode.make(data)
-    img.save(f'app/static/qr/f{name}.png')
+    img.save(f'static/qr/f{name}.png')
     return {'status': 'success'}
     # except:
     #     with open(f'static/f{name}.png', 'rb') as f:
@@ -48,5 +48,17 @@ def create_qrcode(url, name):
     return {'status': 'success'}
 
 
+urls = [
+    'http://213.230.69.57:8888/invernment/room/2',
+    'http://213.230.69.57:8888/invernment/room/3',
+    'http://213.230.69.57:8888/invernment/room/4',
+    'http://213.230.69.57:8888/invernment/room/7',
+    'http://213.230.69.57:8888/invernment/room/12',
+    'http://213.230.69.57:8888/invernment/room/21',
+    'http://213.230.69.57:8888/invernment/room/26',
+    'http://213.230.69.57:8888/invernment/room/36',
+
+]
 if __name__ == '__main__':
-    print(create_qrcode('http://213.230.69.57:8888/invernment/room/2', 'test'))
+    for url in urls:
+        print(create_qrcode(url, url.split('/')[-1]))

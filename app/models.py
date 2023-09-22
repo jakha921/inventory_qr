@@ -62,6 +62,7 @@ class Teacher(models.Model):
     degree = models.CharField('Ilmiy darajasi', max_length=255, choices=degree_choices, default='O`rta', blank=True,
                               null=True)
     description = models.TextField('Qisqacha ma`lumot', blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name='Rasm')
 
     def __str__(self):
         return f"Teacher: {self.name} {self.surname} - {self.room}"
@@ -74,6 +75,7 @@ class Teacher(models.Model):
 class Inventory(models.Model):
     name = models.CharField('Inventar nomi', max_length=255)  # 'Inventar nomi
     description = models.TextField('Inventar haqida malumot', blank=True, null=True)  # 'Inventar haqida malumot
+    photo = models.ImageField(upload_to='inventories/', blank=True, null=True, verbose_name='Inventar rasmi')
 
     def __str__(self):
         return f'{self.name}'
