@@ -17,6 +17,7 @@ def create_warehouse_statuses(sender, instance, **kwargs):
                     inventory=instance.inventory,
                     count=0,
                     status=status,
+                    price=instance.price
                 )
 
 
