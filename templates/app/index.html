@@ -71,6 +71,9 @@
 
 
 <!-- table -->
+
+{% if user.is_authenticated %}
+
 <div style="margin: 0 7%;">
     <table class="table table-hover table-bordered justify-content-center rounded-3 shadow bg-body-tertiary boder-0">
         <thead class="table-secondary">
@@ -98,6 +101,9 @@
         </tbody>
     </table>
 </div>
+
+{% endif %}
+
 <!--end table-->
 
 
