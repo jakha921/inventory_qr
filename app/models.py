@@ -76,6 +76,7 @@ class Inventory(models.Model):
     name = models.CharField('Inventar nomi', max_length=255)  # 'Inventar nomi
     description = models.TextField('Inventar haqida malumot', blank=True, null=True)  # 'Inventar haqida malumot
     photo = models.ImageField(upload_to='inventories/', blank=True, null=True, verbose_name='Inventar rasmi')
+    price = models.FloatField('Narxi', blank=True, null=True)  # 'Narxi
 
     def __str__(self):
         return f'{self.name}'
