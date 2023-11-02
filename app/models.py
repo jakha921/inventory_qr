@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -77,6 +78,8 @@ class Inventory(models.Model):
     description = models.TextField('Inventar haqida malumot', blank=True, null=True)  # 'Inventar haqida malumot
     photo = models.ImageField(upload_to='inventories/', blank=True, null=True, verbose_name='Inventar rasmi')
     price = models.FloatField('Narxi', blank=True, null=True)  # 'Narxi
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     def __str__(self):
         return f'{self.name}'
@@ -90,6 +93,8 @@ class RoomInventory(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name='Xona raqami')
     inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi')
     count = models.IntegerField('Soni')
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     def __str__(self):
         return f'Resurs: {self.inventory.name} - {self.room.room_number}'
@@ -105,15 +110,27 @@ class Warehouse(models.Model):
         ('Ta`mir qilinmoqda', 'Ta`mir qilinmoqda'),
         ('Xonaga o`rnatilgan', 'Xonaga o`rnatilgan'),
         ('Buzilgan', 'Buzilgan'),
+        ('Boshqalar', 'Boshqalar'),
     )
 
-    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi')
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi', blank=True,
+                                  null=True)
+    additional_expenses = models.CharField('Qo`shimcha xarajatlar', max_length=255, blank=True, null=True)
     count = models.IntegerField('Soni')
     status = models.CharField('Holati', max_length=255, choices=status_choices, default='Omborda')
     price = models.FloatField('Narxi', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def clean(self):
+        if self.status == 'Boshqalar' and not self.additional_expenses:
+            raise ValidationError({'additional_expenses': 'Qo`shimcha xarajatlar bo`sh bo`lishi mumkin emas!'})
+        if self.status == 'Boshqalar' and not self.inventory:
+            self.inventory = None  # Make inventory field optional
+        super().clean()
 
     def __str__(self):
-        return f'Inventar: {self.inventory.name}'
+        return f'Inventar: {self.status}'
 
     class Meta:
         verbose_name_plural = 'Ombor'

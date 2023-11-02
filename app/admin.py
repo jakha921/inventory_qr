@@ -94,7 +94,6 @@ class WarehouseAdmin(admin.ModelAdmin):
     # readonly_fields = ('inventory', 'status')
 
     def inventory_name(self, obj):
-        return f'{obj.inventory.name} {obj.count} ta'
+        return f'{obj.inventory.name} {obj.count} ta' if obj.inventory else f'{obj.id} - {obj.count} ta'
 
     inventory_name.short_description = 'Inventar'
-
