@@ -69,8 +69,8 @@ class Teacher(models.Model):
         return f"Teacher: {self.name} {self.surname} - {self.room}"
 
     class Meta:
-        verbose_name_plural = 'Ma`sul'
-        verbose_name = 'Ma`sullar'
+        verbose_name_plural = 'Xodimlar'
+        verbose_name = 'Xodimlar'
 
 
 class Inventory(models.Model):
@@ -109,25 +109,16 @@ class Warehouse(models.Model):
         ('Omborda', 'Omborda'),
         ('Ta`mir qilinmoqda', 'Ta`mir qilinmoqda'),
         ('Xonaga o`rnatilgan', 'Xonaga o`rnatilgan'),
-        ('Buzilgan', 'Buzilgan'),
-        ('Boshqalar', 'Boshqalar'),
+        ('Buzilgan', 'Buzilgan')
     )
 
     inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi', blank=True,
                                   null=True)
-    additional_expenses = models.CharField('Qo`shimcha xarajatlar', max_length=255, blank=True, null=True)
     count = models.IntegerField('Soni')
     status = models.CharField('Holati', max_length=255, choices=status_choices, default='Omborda')
     price = models.FloatField('Narxi', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
-
-    def clean(self):
-        if self.status == 'Boshqalar' and not self.additional_expenses:
-            raise ValidationError({'additional_expenses': 'Qo`shimcha xarajatlar bo`sh bo`lishi mumkin emas!'})
-        if self.status == 'Boshqalar' and not self.inventory:
-            self.inventory = None  # Make inventory field optional
-        super().clean()
 
     def __str__(self):
         return f'Inventar: {self.status}'
@@ -135,3 +126,34 @@ class Warehouse(models.Model):
     class Meta:
         verbose_name_plural = 'Ombor'
         verbose_name = 'Omborlar'
+
+
+class AdditionalExpense(models.Model):
+    name = models.CharField('Nomi', max_length=255)
+    description = models.TextField('Qisqacha ma`lumot', blank=True, null=True)
+    price = models.FloatField('Narxi', blank=True, null=True)
+    action_date = models.DateField('Xarajat qilinga vaqt', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f'Xarajat: {self.name}'
+
+    class Meta:
+        verbose_name_plural = 'Xarajatlar'
+        verbose_name = 'Xarajat'
+
+
+class TeacherInventory(models.Model):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, verbose_name='O`qituvchi')
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi')
+    count = models.IntegerField('Soni')
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.teacher.name} - {self.inventory.name} - {self.count}"
+
+    class Meta:
+        verbose_name_plural = 'Xodimdagi inventar'
+        verbose_name = 'Xodimlardagi inventarlar'

@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from app.models import Corpus, Floor, Room, Teacher, Inventory, RoomInventory, Warehouse
+from app.models import Corpus, Floor, Room, Teacher, Inventory, RoomInventory, Warehouse, TeacherInventory, \
+    AdditionalExpense
 
 # Register your models here.
 admin.site.site_header = 'Inventar boshqaruv tizimi'
@@ -91,9 +92,28 @@ class WarehouseAdmin(admin.ModelAdmin):
     list_filter = ('status', 'inventory')
     search_fields = ('inventory', 'status', 'count')
     list_editable = ('count',)
+
     # readonly_fields = ('inventory', 'status')
 
     def inventory_name(self, obj):
         return f'{obj.inventory.name} {obj.count} ta' if obj.inventory else f'{obj.id} - {obj.count} ta'
 
     inventory_name.short_description = 'Inventar'
+
+
+@admin.register(TeacherInventory)
+class TeacherInventoryAdmin(admin.ModelAdmin):
+    list_display = ('teacher_inventory', 'teacher', 'inventory', 'count')
+    list_filter = ('teacher', 'inventory', 'count')
+    search_fields = ('teacher', 'inventory', 'count')
+    list_editable = ('count',)
+
+    def teacher_inventory(self, obj):
+        return f"{obj.teacher.surname} {obj.teacher.name} - {obj.inventory.name}"
+
+    teacher_inventory.short_description = 'O`qituvchi inventari'
+
+
+@admin.register(AdditionalExpense)
+class AdditionalExpenseAdmin(admin.ModelAdmin):
+    pass
