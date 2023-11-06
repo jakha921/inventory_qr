@@ -1,7 +1,7 @@
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, pre_delete
 from django.dispatch import receiver
 
-from app.models import Warehouse
+from app.models import Warehouse, RoomInventory, TeacherInventory
 
 
 # Signal executed after saving a Warehouse object
@@ -40,3 +40,46 @@ def update_omborda_count(sender, instance, **kwargs):
             # Update the count in the 'Omborda' record based on the change
             omborda_instance.count -= count_diff
             omborda_instance.save()
+
+
+# Signal executed after saving a RoomInventory object and TeacherInventory object
+@receiver(post_save, sender=RoomInventory)
+@receiver(post_save, sender=TeacherInventory)
+def update_warehouse_count(sender, instance, **kwargs):
+    # Get the current count in the 'Omborda' record for the given inventory
+    try:
+        warehouse = Warehouse.objects.get(inventory=instance.inventory, status='Omborda')
+    except Warehouse.DoesNotExist:
+        raise Exception("Ushbu inventar omborida mavjud emas.")
+
+    if warehouse:
+        # Calculate the difference between the previous count and the new count
+        if instance.pk is not None:
+            old_instance = sender.objects.get(pk=instance.pk)
+            count_difference = instance.count - old_instance.count
+        else:
+            count_difference = instance.count
+
+        # Check if the count difference is valid
+        if warehouse.count - count_difference >= 0:
+            # Update the warehouse count
+            warehouse.count -= count_difference
+            warehouse.save()
+        else:
+            # Rollback the count update
+            raise Exception('Omborda inventarizatsiya etarli emas')
+
+
+@receiver(pre_delete, sender=RoomInventory)
+@receiver(pre_delete, sender=TeacherInventory)
+def update_warehouse_count_on_delete(sender, instance, **kwargs):
+    # Get the current count in the 'Omborda' record for the given inventory
+    try:
+        warehouse = Warehouse.objects.get(inventory=instance.inventory, status='Omborda')
+    except Warehouse.DoesNotExist:
+        raise Exception("Ushbu inventar omborida mavjud emas.")
+
+    if warehouse:
+        # Increase the warehouse count when a record is deleted
+        warehouse.count += instance.count
+        warehouse.save()
