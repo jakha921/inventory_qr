@@ -59,14 +59,14 @@ class Teacher(models.Model):
     image = models.CharField('Rasm', max_length=255,
                              default='https://cdn4.iconfinder.com/data/icons/signicon-pt-1-1/100/041_-_user_profile_avatar_login_account-1024.png')
     email = models.EmailField(blank=True, null=True)
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name='Ma`sul xona')
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name='Ma`sul xona', blank=True, null=True)
     degree = models.CharField('Ilmiy darajasi', max_length=255, choices=degree_choices, default='O`rta', blank=True,
                               null=True)
     description = models.TextField('Qisqacha ma`lumot', blank=True, null=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name='Rasm')
 
     def __str__(self):
-        return f"Teacher: {self.name} {self.surname} - {self.room}"
+        return f"Xodim: {self.name} {self.surname} - {self.room.room_number if self.room else ''}"
 
     class Meta:
         verbose_name_plural = 'Xodimlar'
@@ -91,7 +91,8 @@ class Inventory(models.Model):
 
 class RoomInventory(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name='Xona raqami')
-    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi')
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi',
+                                  limit_choices_to={'warehouse__status': 'Omborda'})
     count = models.IntegerField('Soni')
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
@@ -146,7 +147,8 @@ class AdditionalExpense(models.Model):
 
 class TeacherInventory(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, verbose_name='O`qituvchi')
-    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi')
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi',
+                                  limit_choices_to={'warehouse__status': 'Omborda'})
     count = models.IntegerField('Soni')
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
