@@ -54,8 +54,10 @@ class TeacherAdmin(admin.ModelAdmin):
     list_editable = ('name', 'surname', 'patronymic', 'room')
 
     def teacher_room(self, obj):
-        return (f'{obj.room.floor.corpus.name} Korpusi, {obj.room.floor.floor_number} - qavat, '
-                f'{obj.room.room_number} - xona, {obj.surname} {obj.name} {obj.patronymic or ""}')
+        msg = f'{obj.surname} {obj.name} {obj.patronymic or ""}'
+        if obj.room:
+            msg += f' - {obj.room.room_number} - xona'
+        return msg
 
     teacher_room.short_description = 'O`qituvchiga tegishli xona'
 
@@ -116,4 +118,7 @@ class TeacherInventoryAdmin(admin.ModelAdmin):
 
 @admin.register(AdditionalExpense)
 class AdditionalExpenseAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'price', 'action_date')
+    list_filter = ('name', 'price', 'action_date')
+    search_fields = ('name', 'price', 'action_date')
+    list_editable = ('price', 'action_date')

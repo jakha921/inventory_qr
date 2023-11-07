@@ -22,7 +22,7 @@ def create_warehouse_statuses(sender, instance, **kwargs):
 
 
 # Signal executed before saving a Warehouse object
-@receiver(pre_save, sender=Warehouse)
+@receiver(post_save, sender=Warehouse)
 def update_omborda_count(sender, instance, **kwargs):
     try:
         old_instance = Warehouse.objects.get(pk=instance.pk)
@@ -31,6 +31,7 @@ def update_omborda_count(sender, instance, **kwargs):
 
     if old_instance:
         if instance.status != 'Omborda':
+            print('update_omborda_count ')
             # Calculate the difference in count between the current and old record
             count_diff = instance.count - old_instance.count
 
@@ -49,25 +50,28 @@ def update_warehouse_count(sender, instance, **kwargs):
     # Get the current count in the 'Omborda' record for the given inventory
     try:
         warehouse = Warehouse.objects.get(inventory=instance.inventory, status='Omborda')
+        warehouse_room = Warehouse.objects.get(inventory=instance.inventory, status='Xonaga o`rnatilgan')
     except Warehouse.DoesNotExist:
         raise Exception("Ushbu inventar omborida mavjud emas.")
 
     if warehouse:
-        # Calculate the difference between the previous count and the new count
-        if instance.pk is not None:
-            old_instance = sender.objects.get(pk=instance.pk)
-            count_difference = instance.count - old_instance.count
-        else:
-            count_difference = instance.count
+        # Check if the record is being created or updated
+        if kwargs['created']:
+            # Decrease the warehouse count when a record is created
+            warehouse.count -= instance.count
+            warehouse_room.count += instance.count
+        elif not kwargs['created']:
+            # Calculate the difference in count between the current and old record
+            count_diff = instance.count - instance.__class__.objects.get(pk=instance.pk).count
 
-        # Check if the count difference is valid
-        if warehouse.count - count_difference >= 0:
-            # Update the warehouse count
-            warehouse.count -= count_difference
-            warehouse.save()
-        else:
-            # Rollback the count update
-            raise Exception('Omborda inventarizatsiya etarli emas')
+            # Update the warehouse count based on the change
+            warehouse.count -= count_diff
+            warehouse_room.count += count_diff
+
+        print('warehouse', warehouse.count)
+        warehouse.save()
+        warehouse_room.save()
+        print('warehouse', warehouse.count)
 
 
 @receiver(pre_delete, sender=RoomInventory)
