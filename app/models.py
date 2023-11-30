@@ -134,6 +134,7 @@ class AdditionalExpense(models.Model):
     description = models.TextField('Qisqacha ma`lumot', blank=True, null=True)
     price = models.FloatField('Narxi', blank=True, null=True)
     action_date = models.DateField('Xarajat qilinga vaqt', blank=True, null=True)
+    check_img = models.ImageField(upload_to='checks/', blank=True, null=True, verbose_name='Chek rasmi')
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
@@ -143,6 +144,18 @@ class AdditionalExpense(models.Model):
     class Meta:
         verbose_name_plural = 'Xarajatlar'
         verbose_name = 'Xarajat'
+
+
+class AdditionalExpensePhoto(models.Model):
+    additional_expense = models.ForeignKey(AdditionalExpense, on_delete=models.CASCADE, verbose_name='Xarajat')
+    photo = models.ImageField(upload_to='additional_expense_photos/', blank=True, null=True, verbose_name='Rasm')
+
+    def __str__(self):
+        return f'Xarajat: {self.additional_expense.name}'
+
+    class Meta:
+        verbose_name_plural = 'Xarajatlar rasmlari'
+        verbose_name = 'Xarajat rasmlari'
 
 
 class TeacherInventory(models.Model):

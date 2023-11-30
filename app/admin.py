@@ -1,7 +1,8 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from app.models import Corpus, Floor, Room, Teacher, Inventory, RoomInventory, Warehouse, TeacherInventory, \
-    AdditionalExpense
+    AdditionalExpense, AdditionalExpensePhoto
 
 # Register your models here.
 admin.site.site_header = 'Inventar boshqaruv tizimi'
@@ -116,9 +117,36 @@ class TeacherInventoryAdmin(admin.ModelAdmin):
     teacher_inventory.short_description = 'O`qituvchi inventari'
 
 
+# register additional expense photo inline
+class AdditionalExpensePhotoInline(admin.TabularInline):
+    model = AdditionalExpensePhoto
+    extra = 1
+    fields = ('photo', 'photo_preview')
+    readonly_fields = ('photo_preview',)
+
+    def photo_preview(self, obj):
+        if obj.photo:
+            return mark_safe(f'<img src="{obj.photo.url}" width="200" height="150" />')
+        return 'Rasm yo`q'
+
+    photo_preview.short_description = 'Rasm'
+
+
 @admin.register(AdditionalExpense)
 class AdditionalExpenseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'action_date')
+    list_display = ('name', 'price', 'action_date', 'check_img_preview')
     list_filter = ('name', 'price', 'action_date')
     search_fields = ('name', 'price', 'action_date')
     list_editable = ('price', 'action_date')
+
+    # img preview
+    readonly_fields = ('check_img_preview',)
+
+    def check_img_preview(self, obj):
+        if obj.check_img:
+            return mark_safe(f'<img src="{obj.check_img.url}" width="100" height="70" />')
+        return 'Rasm yo`q'
+
+    check_img_preview.short_description = 'Chek rasmi'
+
+    inlines = [AdditionalExpensePhotoInline]
