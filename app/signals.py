@@ -31,7 +31,7 @@ def update_omborda_count(sender, instance, **kwargs):
 
     if old_instance:
         if instance.status != 'Omborda':
-            print('update_omborda_count ')
+            # print('update_omborda_count ')
             # Calculate the difference in count between the current and old record
             count_diff = instance.count - old_instance.count
 
