@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from app.models import Corpus, Floor, Room, Teacher, Inventory, RoomInventory, Warehouse, TeacherInventory, \
-    AdditionalExpense, AdditionalExpensePhoto
+    AdditionalExpense, AdditionalExpensePhoto, Department
 
 # Register your models here.
 admin.site.site_header = 'Inventar boshqaruv tizimi'
@@ -50,7 +50,7 @@ class RoomAdmin(admin.ModelAdmin):
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
     list_display = ('teacher_room', 'name', 'surname', 'patronymic', 'room')
-    list_filter = ('name', 'surname', 'room')
+    list_filter = ('department__name', 'name', 'surname', 'room')
     search_fields = ('name', 'surname', 'patronymic', 'phone', 'email', 'room')
     list_editable = ('name', 'surname', 'patronymic', 'room')
 
@@ -150,3 +150,10 @@ class AdditionalExpenseAdmin(admin.ModelAdmin):
     check_img_preview.short_description = 'Chek rasmi'
 
     inlines = [AdditionalExpensePhotoInline]
+
+
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description')
+    list_filter = ('name', 'description')
+    search_fields = ('name', 'description')

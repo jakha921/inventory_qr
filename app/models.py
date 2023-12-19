@@ -42,6 +42,21 @@ class Room(models.Model):
         verbose_name = 'Xonalar'
 
 
+class Department(models.Model):
+    name = models.CharField('Nomi', max_length=255)
+    description = models.TextField('Qisqacha ma`lumot', blank=True, null=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, verbose_name='Ota bo`lim', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f'Bo`lim: {self.name}'
+
+    class Meta:
+        verbose_name_plural = 'Bo`limlar'
+        verbose_name = 'Bo`limlar'
+
+
 class Teacher(models.Model):
     degree_choices = (
         ('O`rta', 'O`rta'),
@@ -64,6 +79,7 @@ class Teacher(models.Model):
                               null=True)
     description = models.TextField('Qisqacha ma`lumot', blank=True, null=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name='Rasm')
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name='Bo`limi', blank=True, null=True)
 
     def __str__(self):
         return f"Xodim: {self.name} {self.surname} - {self.room.room_number if self.room else ''}"
