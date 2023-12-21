@@ -68,10 +68,8 @@ def update_warehouse_count(sender, instance, **kwargs):
             warehouse.count -= count_diff
             warehouse_room.count += count_diff
 
-        print('warehouse', warehouse.count)
         warehouse.save()
         warehouse_room.save()
-        print('warehouse', warehouse.count)
 
 
 @receiver(pre_delete, sender=RoomInventory)
