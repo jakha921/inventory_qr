@@ -1,63 +1,10 @@
-from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
+from django.utils.html import format_html
 
 
 # Create your models here.
-# Create models as Corpus, Floor, Room, Teacher, Invetory, RoomInventory
-
-class Corpus(models.Model):
-    name = models.CharField('Korpus nomi', max_length=255)
-    address = models.CharField('Korpus manzili', max_length=100, blank=True, null=True)
-    description = models.TextField('Korpus haqida malumot', blank=True, null=True)
-
-    def __str__(self):
-        return f"Corpus: {self.name}"
-
-    class Meta:
-        verbose_name_plural = 'Korpus'
-        verbose_name = 'Korpuslar'
-
-
-class Floor(models.Model):
-    floor_number = models.IntegerField('Qavat raqami')
-    corpus = models.ForeignKey(Corpus, on_delete=models.CASCADE, verbose_name='Korpus')
-
-    def __str__(self):
-        return f"Floors: {self.floor_number} - {self.corpus.name}"
-
-    class Meta:
-        verbose_name_plural = 'Qavat'
-        verbose_name = 'Qavatlar'
-
-
-class Room(models.Model):
-    room_number = models.CharField('Xona raqami', max_length=255)
-    floor = models.ForeignKey(Floor, on_delete=models.CASCADE, verbose_name='Qavat')
-
-    def __str__(self):
-        return f"Room: {self.room_number} - {self.floor.floor_number}"
-
-    class Meta:
-        verbose_name_plural = 'Xona'
-        verbose_name = 'Xonalar'
-
-
-class Department(models.Model):
-    name = models.CharField('Nomi', max_length=255)
-    description = models.TextField('Qisqacha ma`lumot', blank=True, null=True)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, verbose_name='Ota bo`lim', blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
-
-    def __str__(self):
-        return f'Bo`lim: {self.name}'
-
-    class Meta:
-        verbose_name_plural = 'Bo`limlar'
-        verbose_name = 'Bo`limlar'
-
-
-class Teacher(models.Model):
+class Employee(models.Model):
     degree_choices = (
         ('O`rta', 'O`rta'),
         ('Bakalavr', 'Bakalavr'),
@@ -74,26 +21,70 @@ class Teacher(models.Model):
     image = models.CharField('Rasm', max_length=255,
                              default='https://cdn4.iconfinder.com/data/icons/signicon-pt-1-1/100/041_-_user_profile_avatar_login_account-1024.png')
     email = models.EmailField(blank=True, null=True)
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name='Ma`sul xona', blank=True, null=True)
     degree = models.CharField('Ilmiy darajasi', max_length=255, choices=degree_choices, default='O`rta', blank=True,
                               null=True)
     description = models.TextField('Qisqacha ma`lumot', blank=True, null=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name='Rasm')
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name='Bo`limi', blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     def __str__(self):
-        return f"Xodim: {self.name} {self.surname} - {self.room.room_number if self.room else ''}"
+        return f"Xodim: {self.name} {self.surname}"
+
+    def get_rooms(self):
+        rooms = self.room_set.all()
+        room_links = []
+        for room in rooms:
+            url = reverse('admin:app_room_change', args=[room.id])
+            room_links.append(format_html('<a href="{}">{}</a>', url, room.corpus.name + ' > ' + room.room_number))
+        return format_html(', '.join(room_links))
+
+    get_rooms.short_description = 'Xodim xonasi'
 
     class Meta:
         verbose_name_plural = 'Xodimlar'
         verbose_name = 'Xodimlar'
+        ordering = ['surname', 'name']
+
+
+class Corpus(models.Model):
+    name = models.CharField('Korpus nomi', max_length=255)
+    address = models.CharField('Korpus manzili', max_length=100, blank=True, null=True)
+    description = models.TextField('Korpus haqida malumot', blank=True, null=True)
+
+    def __str__(self):
+        return f'Korpus: {self.name}'
+
+    class Meta:
+        verbose_name_plural = 'Korpus'
+        verbose_name = 'Korpuslar'
+        ordering = ['name']
+
+
+class Room(models.Model):
+    room_number = models.CharField('Xona raqami', max_length=255)
+    corpus = models.ForeignKey(Corpus, on_delete=models.CASCADE, verbose_name='Korpus')
+    room_manager = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name='Xona masul xodim', blank=True,
+                                     null=True)
+
+    def __str__(self):
+        return f"Korpus: {self.corpus.name} > Xona: {self.room_number}"
+
+    class Meta:
+        verbose_name_plural = 'Xona'
+        verbose_name = 'Xonalar'
+        ordering = ['room_number']
 
 
 class Inventory(models.Model):
     name = models.CharField('Inventar nomi', max_length=255)  # 'Inventar nomi
+    number = models.CharField('Inventar raqami', max_length=500, blank=True, null=True)  # 'Inventar raqami
     description = models.TextField('Inventar haqida malumot', blank=True, null=True)  # 'Inventar haqida malumot
     photo = models.ImageField(upload_to='inventories/', blank=True, null=True, verbose_name='Inventar rasmi')
-    price = models.FloatField('Narxi', blank=True, null=True)  # 'Narxi
+    price = models.IntegerField('Inventar narxi', blank=True, null=True)  # 'Inventar narxi
+    count = models.IntegerField('Invenrar soni', blank=True, null=True)  # 'Invenrar soni
+
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
@@ -103,13 +94,14 @@ class Inventory(models.Model):
     class Meta:
         verbose_name_plural = 'Inventar'
         verbose_name = 'Inventarlar'
+        ordering = ['-created_at']
 
 
 class RoomInventory(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name='Xona raqami')
-    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi',
-                                  limit_choices_to={'warehouse__status': 'Omborda'})
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi')
     count = models.IntegerField('Soni')
+
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
@@ -119,72 +111,21 @@ class RoomInventory(models.Model):
     class Meta:
         verbose_name_plural = 'Xonadagi inventar'
         verbose_name = 'Xonadagi inventarlar'
+        ordering = ['-created_at']
 
 
-class Warehouse(models.Model):
-    status_choices = (
-        ('Omborda', 'Omborda'),
-        ('Ta`mir qilinmoqda', 'Ta`mir qilinmoqda'),
-        ('Xonaga o`rnatilgan', 'Xonaga o`rnatilgan'),
-        ('Buzilgan', 'Buzilgan')
-    )
-
-    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi', blank=True,
-                                  null=True)
+class EmployeeInventory(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name='Xodim')
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi')
     count = models.IntegerField('Soni')
-    status = models.CharField('Holati', max_length=255, choices=status_choices, default='Omborda')
-    price = models.FloatField('Narxi', blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     def __str__(self):
-        return f'Inventar: {self.status}'
-
-    class Meta:
-        verbose_name_plural = 'Ombor'
-        verbose_name = 'Omborlar'
-
-
-class AdditionalExpense(models.Model):
-    name = models.CharField('Nomi', max_length=255)
-    description = models.TextField('Qisqacha ma`lumot', blank=True, null=True)
-    price = models.FloatField('Narxi', blank=True, null=True)
-    action_date = models.DateField('Xarajat qilinga vaqt', blank=True, null=True)
-    check_img = models.ImageField(upload_to='checks/', blank=True, null=True, verbose_name='Chek rasmi')
-    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
-
-    def __str__(self):
-        return f'Xarajat: {self.name}'
-
-    class Meta:
-        verbose_name_plural = 'Xarajatlar'
-        verbose_name = 'Xarajat'
-
-
-class AdditionalExpensePhoto(models.Model):
-    additional_expense = models.ForeignKey(AdditionalExpense, on_delete=models.CASCADE, verbose_name='Xarajat')
-    photo = models.ImageField(upload_to='additional_expense_photos/', blank=True, null=True, verbose_name='Rasm')
-
-    def __str__(self):
-        return f'Xarajat: {self.additional_expense.name}'
-
-    class Meta:
-        verbose_name_plural = 'Xarajatlar rasmlari'
-        verbose_name = 'Xarajat rasmlari'
-
-
-class TeacherInventory(models.Model):
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, verbose_name='O`qituvchi')
-    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi',
-                                  limit_choices_to={'warehouse__status': 'Omborda'})
-    count = models.IntegerField('Soni')
-    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.teacher.name} - {self.inventory.name} - {self.count}"
+        return f"{self.employee.name} - {self.inventory.name} - {self.count}"
 
     class Meta:
         verbose_name_plural = 'Xodimdagi inventar'
         verbose_name = 'Xodimlardagi inventarlar'
+        ordering = ['-created_at']

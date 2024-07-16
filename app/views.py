@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from app.models import Room, Warehouse
+from app.models import Room
 from app.utils import create_qrcode
 
 
@@ -37,13 +37,13 @@ def internment(request):
     return render(request, "app/invernments.html", context)
 
 
-def warehouse_details(request):
-    warehouse = Warehouse.objects.all().order_by('inventory__name', 'price')
-
-    # add new var to warehouse
-    for item in warehouse:
-        item.total_price = item.count * item.price
-
-    sum_price = sum([item.total_price for item in warehouse])
-
-    return render(request, "app/warehouse.html", {'warehouses': warehouse, 'sum_price': sum_price})
+# def warehouse_details(request):
+#     warehouse = Warehouse.objects.all().order_by('inventory__name', 'price')
+#
+#     # add new var to warehouse
+#     for item in warehouse:
+#         item.total_price = item.count * item.price
+#
+#     sum_price = sum([item.total_price for item in warehouse])
+#
+#     return render(request, "app/warehouse.html", {'warehouses': warehouse, 'sum_price': sum_price})
