@@ -9,7 +9,7 @@ def export_room_inventory_to_excel(modeladmin, request, queryset):
     sheet.title = 'Room Inventory'
 
     # Add header row
-    headers = ['Xona', 'Inventar', 'Inventar raqami', 'Soni']
+    headers = ['Xona', 'Inventar', 'Inventar raqami']
     sheet.append(headers)
 
     # Add data rows
@@ -18,8 +18,7 @@ def export_room_inventory_to_excel(modeladmin, request, queryset):
             row = [
                 room_inventory.room.room_number,
                 room_inventory.inventory.name,
-                room_inventory.inventory.number,
-                room_inventory.count,
+                room_inventory.inventory_number,
             ]
             sheet.append(row)
 
@@ -40,23 +39,22 @@ def export_employee_inventory_to_excel(modeladmin, request, queryset):
     sheet.title = 'Employee Inventory'
 
     # Add header row
-    headers = ['Xodim', 'Inventar', 'Inventar raqami', 'Soni']
+    headers = ['Xodim', 'Inventar', 'Inventar raqami']
     sheet.append(headers)
 
     # Add data rows
     for employee in queryset:
         for employee_inventory in employee.employeeinventory_set.all():
             row = [
-                employee_inventory.employee.name,
+                employee_inventory.employee.surname + ' ' + employee_inventory.employee.name,
                 employee_inventory.inventory.name,
-                employee_inventory.inventory.number,
-                employee_inventory.count,
+                employee_inventory.inventory_number,
             ]
             sheet.append(row)
 
     # Set the response as an Excel file
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename={queryset.first().name}_inventory.xlsx'
+    response['Content-Disposition'] = f'attachment; filename={queryset.first().surname}_{queryset.first().name}_inventory.xlsx'
     workbook.save(response)
     return response
 

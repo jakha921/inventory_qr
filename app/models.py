@@ -79,7 +79,6 @@ class Room(models.Model):
 
 class Inventory(models.Model):
     name = models.CharField('Inventar nomi', max_length=255)  # 'Inventar nomi
-    number = models.CharField('Inventar raqami', max_length=500, blank=True, null=True)  # 'Inventar raqami
     description = models.TextField('Inventar haqida malumot', blank=True, null=True)  # 'Inventar haqida malumot
     photo = models.ImageField(upload_to='inventories/', blank=True, null=True, verbose_name='Inventar rasmi')
     price = models.IntegerField('Inventar narxi', blank=True, null=True)  # 'Inventar narxi
@@ -100,7 +99,7 @@ class Inventory(models.Model):
 class RoomInventory(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name='Xona raqami')
     inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi')
-    count = models.IntegerField('Soni')
+    inventory_number = models.CharField('Inventar raqami', max_length=500, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
@@ -117,13 +116,13 @@ class RoomInventory(models.Model):
 class EmployeeInventory(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name='Xodim')
     inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, verbose_name='Inventar nomi')
-    count = models.IntegerField('Soni')
+    inventory_number = models.CharField('Inventar raqami', max_length=500, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.employee.name} - {self.inventory.name} - {self.count}"
+        return f"{self.employee.name}: {self.inventory.name} - {self.inventory_number}"
 
     class Meta:
         verbose_name_plural = 'Xodimdagi inventar'

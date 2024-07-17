@@ -20,7 +20,7 @@ class CorpusAdmin(admin.ModelAdmin):
 
 @admin.register(Inventory)
 class InventoryAdmin(admin.ModelAdmin):
-    list_display = ('invetory_name', 'name', 'number', 'description', 'price', 'count', 'image_preview')
+    list_display = ('invetory_name', 'name', 'description', 'price', 'count', 'image_preview')
     search_fields = ('name', 'description')
 
     def invetory_name(self, obj):
@@ -38,7 +38,6 @@ class InventoryAdmin(admin.ModelAdmin):
 class RoomInventoryAdmin(admin.TabularInline):
     model = RoomInventory
     extra = 1
-    fields = ('inventory', 'count')
     can_delete = False
     classes = ('collapse',)
     show_change_link = True
@@ -48,7 +47,9 @@ class RoomInventoryAdmin(admin.TabularInline):
 class RoomAdmin(admin.ModelAdmin):
     list_display = ('room_locations', 'get_room_manager')
     list_filter = ('corpus',)  # 'room_number', 'room_manager'
-    search_fields = ('room_number', 'room_manager__name', 'room_manager__surname', 'corpus__name')
+    search_fields = (
+        'room_number', 'room_manager__name', 'room_manager__surname', 'corpus__name', 'roominventory__inventory__name',
+        'roominventory__inventory_number')
     actions = [export_room_inventory_to_excel]
 
     def room_locations(self, obj):
@@ -72,7 +73,6 @@ class RoomAdmin(admin.ModelAdmin):
 class EmployeeInventoryAdmin(admin.TabularInline):
     model = EmployeeInventory
     extra = 1
-    fields = ('inventory', 'count')
     can_delete = False
     classes = ('collapse',)
     show_change_link = True
@@ -81,7 +81,9 @@ class EmployeeInventoryAdmin(admin.TabularInline):
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('name', 'surname', 'get_rooms')
-    search_fields = ('name', 'surname', 'patronymic', 'phone', 'email')
+    search_fields = (
+        'name', 'surname', 'patronymic', 'phone', 'email', 'employeeinventory__inventory__name',
+        'employeeinventory__inventory_number')
     actions = [export_employee_inventory_to_excel]
 
     inlines = [EmployeeInventoryAdmin]
